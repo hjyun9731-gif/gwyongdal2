@@ -1,0 +1,873 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#4f46e5">
+  <title>운수종사자 일상점검 - 완전형 HTML 데모 v3.2</title>
+  
+  <style>
+
+:root{
+  --bg:#f4f6fa; --card:#ffffff; --text:#182230; --muted:#667085; --line:#e4e7ec;
+  --primary:#4f46e5; --primary-dark:#4338ca; --primary-soft:#eef2ff;
+  --ok:#16803d; --ok-soft:#ecfdf3; --warn:#c2410c; --warn-soft:#fff7ed;
+  --bad:#b42318; --bad-soft:#fef3f2; --purple:#7e22ce; --purple-soft:#f3e8ff;
+  --blue:#175cd3; --blue-soft:#eff8ff; --shadow:0 12px 34px rgba(16,24,40,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans KR","Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.demo-bar{background:#101828;color:#fff;text-align:center;padding:7px 12px;font-size:12px}
+.app-header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.header-inner{max-width:1320px;margin:auto;padding:9px 16px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.brand{display:flex;gap:9px;align-items:center}.brand b{display:block}.brand small{display:block;color:var(--muted);font-size:11px}.truck-mark{font-size:28px}
+.mode-tabs{background:var(--primary-soft);padding:4px;border-radius:14px;display:flex;gap:4px}
+.mode-tabs button{border:0;background:transparent;color:#475467;font-weight:800;padding:9px 15px;border-radius:10px}
+.mode-tabs button.active{background:white;color:var(--primary);box-shadow:0 2px 9px rgba(79,70,229,.15)}
+.app-shell{max-width:1320px;margin:auto;padding:22px}
+.driver-shell{max-width:570px;margin:auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow)}
+.card-pad{padding:21px}
+.hero{background:linear-gradient(135deg,#eef2ff 0%,#fff 68%)}
+h1,h2,h3,p{margin-top:0}h1{font-size:27px;line-height:1.28;margin-bottom:9px}h2{font-size:21px;margin-bottom:9px}h3{font-size:17px;margin-bottom:8px}
+.muted{color:var(--muted)}.small{font-size:12px;color:var(--muted)}.section{margin-top:16px}
+.row{display:flex;gap:10px;align-items:center}.between{display:flex;gap:12px;justify-content:space-between;align-items:center}
+.stack{display:grid;gap:10px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.field{margin:14px 0}.field label{display:block;font-weight:800;margin-bottom:7px}
+.field input,.field select,.field textarea{width:100%;padding:14px 15px;border:1.5px solid #d0d5dd;border-radius:13px;background:white;outline:0}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:#8b5cf6;box-shadow:0 0 0 4px #ede9fe}
+.btn{border:0;border-radius:14px;min-height:50px;padding:13px 16px;font-weight:850}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark)}
+.btn-soft{background:var(--primary-soft);color:#3730a3}.btn-ghost{background:#fff;border:1px solid var(--line);color:#344054}
+.btn-ok{background:var(--ok);color:white}.btn-warn{background:#ea580c;color:white}.btn-danger{background:var(--bad);color:white}.btn-full{width:100%}
+.btn-sm{min-height:auto;padding:8px 11px;border-radius:10px;font-size:13px}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}.pill.purple{background:var(--purple-soft);color:var(--purple)}
+.pill.blue{background:var(--blue-soft);color:var(--blue)}.pill.gray{background:#f2f4f7;color:#475467}
+.notice,.success,.danger,.info{padding:13px 14px;border-radius:14px;line-height:1.45}
+.notice{background:var(--warn-soft);border:1px solid #fed7aa}.success{background:var(--ok-soft);border:1px solid #bbf7d0}
+.danger{background:var(--bad-soft);border:1px solid #fecaca}.info{background:var(--blue-soft);border:1px solid #b2ddff}
+.driver-vehicle{display:flex;align-items:center;gap:10px}.truck-svg{width:118px;flex:0 0 auto}
+.big-action{min-height:72px;font-size:19px}
+.check-groups{display:grid;gap:13px}.check-group{border:1px solid var(--line);border-radius:15px;overflow:hidden}
+.group-title{padding:10px 13px;background:#f8fafc;font-weight:900}.check-item{padding:12px 13px;border-top:1px solid #edf0f3;display:flex;gap:9px;align-items:flex-start}
+.check-item:first-child{border-top:0}.check-item input{margin-top:4px;transform:scale(1.25)}
+.complete-hero{text-align:center;padding:26px}.complete-icon{font-size:62px;color:var(--ok)}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}.cal-head{text-align:center;color:var(--muted);font-size:12px;font-weight:900;padding:6px 0}
+.cal-day{min-height:54px;border:1px solid #edf0f3;background:#fafafa;border-radius:10px;padding:7px 2px;text-align:center;font-size:12px}
+.cal-day.clickable{cursor:pointer}.cal-day.clickable:hover{background:#eef2ff}.cal-day b{display:block}
+.cal-mark{display:block;font-size:11px;font-weight:900;margin-top:4px}.cal-day.ok .cal-mark{color:var(--ok)}.cal-day.bad .cal-mark{color:var(--bad)}
+.cal-day.warn .cal-mark{color:#ea580c}.cal-day.purple .cal-mark{color:var(--purple)}.cal-day.gray .cal-mark{color:#64748b}
+.legend{display:flex;gap:7px;flex-wrap:wrap}
+.summary-mini{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.summary-mini .mini{border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center;background:white}.mini b{display:block;font-size:20px}
+.admin-login{max-width:430px;margin:50px auto}
+.admin-layout{display:grid;grid-template-columns:230px 1fr;gap:18px}
+.admin-side{padding:13px;height:fit-content;position:sticky;top:80px}.admin-side button{width:100%;border:0;background:transparent;text-align:left;padding:11px 12px;border-radius:10px;font-weight:800;color:#475467}
+.admin-side button.active{background:var(--primary-soft);color:var(--primary)}
+.metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.metric{background:white;border:1px solid var(--line);border-radius:15px;padding:14px;cursor:pointer}
+.metric:hover{border-color:#c7d2fe}.metric span{color:var(--muted);font-size:12px}.metric b{display:block;font-size:28px;margin-top:4px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.toolbar input,.toolbar select{padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:white}
+.table-wrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:white}
+.data-table{border-collapse:collapse;width:100%}.data-table th,.data-table td{padding:11px 13px;border-bottom:1px solid #edf0f3;text-align:left;white-space:nowrap}
+.data-table th{font-size:12px;color:var(--muted);background:#f8fafc}.data-table tr:hover td{background:#fafaff}
+.link-btn{border:0;background:transparent;color:var(--primary);font-weight:900;padding:0}
+.admin-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.audit-row{padding:12px 0;border-bottom:1px solid #edf0f3}.audit-row:last-child{border-bottom:0}
+.import-row{display:grid;grid-template-columns:65px 1fr 110px 1fr 90px;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #edf0f3}
+.modal{position:fixed;inset:0;background:rgba(16,24,40,.48);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-panel{width:min(680px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:21px;box-shadow:0 30px 80px rgba(0,0,0,.24)}
+.modal-header{position:sticky;top:0;background:#fff;z-index:2;border-bottom:1px solid var(--line);padding:16px 19px;display:flex;justify-content:space-between;align-items:center}
+.modal-body{padding:19px}.icon-button{border:0;background:#f2f4f7;width:36px;height:36px;border-radius:10px}
+.print-root{display:none}
+.legal-screen{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;overflow:auto}
+.legal-paper{background:white;color:#000;width:297mm;min-height:190mm;padding:7mm;margin:auto;font-family:"Noto Sans KR","Malgun Gothic",sans-serif}
+.legal-note{font-size:10pt;margin-bottom:2mm}.legal-title{text-align:center;font-size:16pt;font-weight:700;margin:0 0 4mm}
+.legal-meta,.legal-table{border-collapse:collapse;width:100%;table-layout:fixed}
+.legal-meta th,.legal-meta td,.legal-table th,.legal-table td{border:1px solid #000;color:#000}
+.legal-meta th{font-size:8.5pt;padding:2mm 1mm;background:#fff}.legal-meta td{font-size:9pt;padding:2mm 1mm;text-align:center}
+.legal-table th,.legal-table td{font-size:6.3pt;padding:1.1mm .4mm;text-align:center;vertical-align:middle}
+.legal-table .item-col{text-align:left;padding-left:1.5mm;font-size:7.2pt;line-height:1.25}
+.legal-table .category{width:8mm;font-weight:700;font-size:7.5pt;writing-mode:vertical-rl;letter-spacing:1px}
+.legal-table .item-name{width:47mm}.legal-table .day-col{width:6.3mm}.legal-table .result-title{font-size:8.5pt;padding:1.8mm}
+.legal-table .sign-label,.legal-table .action-label{font-weight:700;font-size:8pt;text-align:center}
+.legal-table .action-text{text-align:left;padding:2mm;font-size:8pt}
+.legal-table .symbol{font-size:9pt;font-weight:700}.source-link{font-size:11px;color:var(--muted);margin-top:8px}
+@media(max-width:980px){.admin-layout{grid-template-columns:1fr}.admin-side{position:static;display:flex;overflow:auto}.admin-side button{width:auto;white-space:nowrap}.metric-grid{grid-template-columns:repeat(2,1fr)}.admin-detail-grid{grid-template-columns:1fr}}
+@media(max-width:620px){.app-shell{padding:13px}.brand small{display:none}.mode-tabs button{padding:8px 10px}.metric-grid{grid-template-columns:repeat(2,1fr)}.summary-mini{grid-template-columns:repeat(3,1fr)}.grid2{grid-template-columns:1fr}h1{font-size:24px}}
+@page{size:A4 landscape;margin:7mm}
+@media print{
+  html,body{background:#fff}
+  body>*:not(#printRoot){display:none!important}
+  #printRoot{display:block!important}
+  .legal-paper{width:auto;min-height:0;padding:0;margin:0}
+  .source-link{display:none}
+}
+
+/* v3.2 회원정보/트럭 개선 */
+.truck-photo-wrap{
+  width:190px; height:112px; overflow:hidden; border-radius:18px;
+  background:linear-gradient(180deg,#f2f8ff,#eef6f0);
+  box-shadow:0 7px 22px rgba(16,24,40,.10); flex:0 0 auto;
+}
+.truck-photo{width:100%;height:100%;object-fit:cover;object-position:center 55%;display:block}
+.member-info-card{
+  background:rgba(255,255,255,.94);border:1px solid #e7eaf0;border-radius:18px;
+  padding:14px 16px;box-shadow:0 5px 18px rgba(16,24,40,.05)
+}
+.member-info-title{display:flex;gap:8px;align-items:center;font-size:17px;margin-bottom:7px}
+.info-line{display:grid;grid-template-columns:125px 1fr;gap:10px;align-items:start;padding:10px 0;border-bottom:1px solid #edf0f3}
+.info-line:last-child{border-bottom:0}.info-line span{color:#667085}.info-line b{color:#101828;word-break:keep-all}
+.admin-only-card{background:#fff5f5;border:1px solid #fecaca;border-radius:18px;padding:14px 16px}
+.admin-only-title{font-weight:900;color:#9f1239;margin-bottom:7px}
+.admin-only-title span{font-size:11px;font-weight:700;color:#9f7aea;margin-left:7px}
+@media(max-width:620px){
+  .truck-photo-wrap{width:140px;height:88px}
+  .info-line{grid-template-columns:105px 1fr}
+}
+
+</style>
+</head>
+<body>
+  <div class="demo-bar">완전형 HTML 데모 v3.2 · 실제 서버 없이 브라우저 localStorage로 동작</div>
+
+  <header class="app-header no-print">
+    <div class="header-inner">
+      <div class="brand">
+        <span class="truck-mark">🚚</span>
+        <div>
+          <b>운수종사자 일상점검</b>
+          <small>1.5t 이하 카고트럭</small>
+        </div>
+      </div>
+      <div class="mode-tabs">
+        <button id="driverModeBtn" class="active">기사 앱</button>
+        <button id="adminModeBtn">협회 관리자</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="app" class="app-shell"></main>
+
+  <div id="modal" class="modal hidden no-print" role="dialog" aria-modal="true">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <b id="modalTitle">상세</b>
+        <button id="modalClose" class="icon-button">✕</button>
+      </div>
+      <div id="modalBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <section id="printRoot" class="print-root"></section>
+
+  <script>
+
+(() => {
+  "use strict";
+  const $=(s,r=document)=>r.querySelector(s);
+  const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+  const KEY="gwyongdal_complete_demo_v3";
+  const ADMIN_KEY="gwyongdal_admin_demo_session";
+  const TODAY=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Seoul",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+  const shift=(base,n)=>{const d=new Date(base+"T12:00:00");d.setDate(d.getDate()+n);return new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Seoul",year:"numeric",month:"2-digit",day:"2-digit"}).format(d)};
+  const fmt=s=>{const [y,m,d]=s.split("-");return `${y}년 ${Number(m)}월 ${Number(d)}일`};
+  const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const now=()=>new Date().toISOString();
+  const time=()=>new Date().toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"});
+  const monthKey=()=>TODAY().slice(0,7);
+
+  const ITEMS=[
+    {group:"외관점검",code:"EXT01",label:"번호판, 전면유리, 후사경 등의 청결상태"},
+    {group:"외관점검",code:"EXT02",label:"후미등, 차폭등 등 등화장치 작동상태"},
+    {group:"외관점검",code:"EXT03",label:"창닦이기 작동상태"},
+    {group:"외관점검",code:"EXT04",label:"적재함(보조지지대 포함), 측면 보호대, 후부반사판, 트레일러 연결장치의 부착 상태 및 훼손 여부"},
+    {group:"상태점검",code:"COND01",label:"타이어 손상 및 마모(1.6mm이상) 여부"},
+    {group:"상태점검",code:"COND02",label:"화물, 적재함 지지대(판스프링) 등의 고정상태"},
+    {group:"상태점검",code:"COND03",label:"바퀴 너트 등 균열 여부"},
+    {group:"기타",code:"ETC01",label:"냉각수, 공기압, 엔진오일 등 차량 이상 여부(계기판 확인)"},
+    {group:"기타",code:"ETC02",label:"좌석안전띠 상태"},
+    {group:"기타",code:"ETC03",label:"소화기 비치 여부"},
+    {group:"기타",code:"ETC04",label:"안전삼각대 등 비치 여부"}
+  ];
+
+  const DEMO_MEMBER={id:1,memberNo:"M0001",qualificationCertificateNo:"11-2020-012345",name:"홍길동",vehicle:"강원81자1234호",vehicleType:"1.5톤 카고(화물)",phone:"010-1234-5678",address:"강원특별자치도 춘천시 중앙로 100",businessName:"홍길동",active:true,joined:false,trackingStart:null,pinState:"unregistered"};
+  const SAMPLE_MEMBERS=[
+    DEMO_MEMBER,
+    {id:2,memberNo:"M0002",name:"김철수",vehicle:"강원82자5678호",phone:"010-2345-6789",address:"강원특별자치도 원주시 무실로 12",businessName:"김철수",active:true,joined:true,trackingStart:shift(TODAY(),-20),pinState:"active"},
+    {id:3,memberNo:"M0003",name:"박영수",vehicle:"강원80바9012호",phone:"010-3456-7890",address:"강원특별자치도 강릉시 경강로 10",businessName:"박영수",active:true,joined:true,trackingStart:shift(TODAY(),-20),pinState:"active"},
+    {id:4,memberNo:"M0004",name:"이성호",vehicle:"강원83자3456호",phone:"010-4567-8901",address:"강원특별자치도 춘천시 후평로 45",businessName:"이성호",active:true,joined:true,trackingStart:shift(TODAY(),-20),pinState:"active"},
+    {id:5,memberNo:"M0005",name:"최민수",vehicle:"강원84자7788호",phone:"010-5678-9012",address:"강원특별자치도 홍천군 홍천읍 77",businessName:"최민수",active:true,joined:true,trackingStart:shift(TODAY(),-20),pinState:"active"},
+    {id:6,memberNo:"M0006",qualificationCertificateNo:"11-2026-000006",name:"정우진",vehicle:"강원85자1122호",vehicleType:"1.5톤 카고(화물)",phone:"010-6789-0123",address:"강원특별자치도 횡성군 횡성읍 21",businessName:"정우진",active:true,joined:false,trackingStart:null,pinState:"unregistered"},
+    {id:7,memberNo:"M0007",name:"장태호",vehicle:"강원86자2233호",phone:"010-7000-1001",address:"강원특별자치도 속초시 중앙로 8",businessName:"장태호",active:true,joined:true,trackingStart:shift(TODAY(),-20),pinState:"active"},
+    {id:8,memberNo:"M0008",name:"한상진",vehicle:"강원87자3344호",phone:"010-7000-1002",address:"강원특별자치도 삼척시 대학로 5",businessName:"한상진",active:true,joined:true,trackingStart:shift(TODAY(),-20),pinState:"active"},
+    {id:9,memberNo:"M0009",name:"오민호",vehicle:"강원88자4455호",phone:"010-7000-1003",address:"강원특별자치도 동해시 천곡로 9",businessName:"오민호",active:true,joined:true,trackingStart:shift(TODAY(),-20),pinState:"active"},
+    {id:10,memberNo:"M0010",name:"윤재현",vehicle:"강원89자5566호",phone:"010-7000-1004",address:"강원특별자치도 태백시 황지로 18",businessName:"윤재현",active:true,joined:true,trackingStart:shift(TODAY(),-20),pinState:"active"},
+    {id:11,memberNo:"M0011",name:"임도현",vehicle:"강원90자6677호",phone:"010-7000-1005",address:"강원특별자치도 평창군 평창읍 31",businessName:"임도현",active:true,joined:true,trackingStart:shift(TODAY(),-20),pinState:"active"},
+    {id:12,memberNo:"M0012",name:"서정민",vehicle:"강원91자7788호",phone:"010-7000-1006",address:"강원특별자치도 철원군 갈말읍 2",businessName:"서정민",active:false,joined:true,trackingStart:shift(TODAY(),-30),pinState:"active"}
+  ];
+
+  function blankState(){
+    const members=JSON.parse(JSON.stringify(SAMPLE_MEMBERS));
+    const inspections={}; members.forEach(m=>inspections[m.id]={});
+    const st={
+      mode:"driver",
+      driver:{registered:false,step:"lookup",memberId:1,loggedIn:true,deviceTrusted:false,pin:"",completionDate:null},
+      members, inspections,
+      complianceEvents:[],
+      addressRequests:[],
+      auditLogs:[],
+      lockouts:[],
+      importBatches:[],
+      settings:{lateEntryMode:"unlimited",lateEntryDays:null,driverSameDayEdit:false,adminCorrection:false,sessionTtlDays:180,maxDevices:3,staffTotpRequired:true},
+      adminUsers:[
+        {id:1,login:"admin",name:"최고관리자",role:"super_admin",totp:true,active:true},
+        {id:2,login:"staff",name:"협회직원",role:"staff",totp:true,active:true},
+        {id:3,login:"viewer",name:"조회전용",role:"read_only",totp:false,active:true}
+      ],
+      adminSession:null
+    };
+    seedOtherMembers(st);
+    return st;
+  }
+
+  function seedOtherMembers(st){
+    const t=TODAY();
+    const mk=t.slice(0,7);
+    const set=(id,date,status,late=false,issues=[])=>st.inspections[id][date]={status,late,issues,time:"08:10",enteredAt:now(),entryChannel:"driver",revisions:1};
+    set(2,t,"normal"); set(3,t,"not_driving"); set(4,t,"issue",false,[{idx:4,note:"타이어 마모 확인, 교체 예정"}]);
+    set(5,t,"normal",true); set(7,t,"normal"); set(8,t,"normal"); set(9,t,"normal"); set(10,t,"not_driving"); set(11,t,"normal");
+    for(const id of [2,3,4,5,7,8,9,10,11]){
+      for(let i=-1;i>=-12;i--){
+        const d=shift(t,i);
+        if(d.slice(0,7)!==mk) continue;
+        if((id+i)%6===0) continue;
+        const status=(id+i)%9===0?"not_driving":"normal";
+        set(id,d,status,false);
+      }
+    }
+  }
+
+  let S;
+  try{S=JSON.parse(localStorage.getItem(KEY))||blankState()}catch{S=blankState()}
+  if(!S.inspections) S=blankState();
+  // v3.2 필드 마이그레이션: 예전 데모 localStorage를 그대로 열어도 새 정보 표시
+  S.members.forEach((m,i)=>{
+    if(!m.vehicleType) m.vehicleType="1.5톤 카고(화물)";
+    if(!m.qualificationCertificateNo) m.qualificationCertificateNo=`11-2026-${String(i+1).padStart(6,"0")}`;
+    if(!m.memberNo) m.memberNo=`M${String(i+1).padStart(4,"0")}`;
+  });
+  localStorage.setItem(KEY,JSON.stringify(S));
+  const save=()=>localStorage.setItem(KEY,JSON.stringify(S));
+  const member=id=>S.members.find(m=>m.id===Number(id));
+  const driverMember=()=>member(S.driver.memberId);
+  const recs=id=>S.inspections[id]||(S.inspections[id]={});
+  const activeEvent=(memberId,date,type)=>S.complianceEvents.find(e=>e.memberId===Number(memberId)&&e.date===date&&e.type===type&&!e.voidedByEventId);
+  const addAudit=(action,target,detail,before=null,after=null)=>{
+    S.auditLogs.unshift({id:Date.now()+Math.random(),at:new Date().toLocaleString("ko-KR"),admin:S.adminSession?.name||"시스템",action,target,detail,before,after});
+    S.auditLogs=S.auditLogs.slice(0,100);save();
+  };
+
+  function truckSvg(){
+    return `<div class="truck-photo-wrap"><img class="truck-photo" src="data:image/webp;base64,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" alt="1.5톤 이하 카고트럭"></div>`;
+  }
+
+  function badge(s){
+    if(s==="완료"||s==="정상")return`<span class="pill ok">${esc(s)}</span>`;
+    if(s.includes("이상"))return`<span class="pill warn">${esc(s)}</span>`;
+    if(s.includes("지연"))return`<span class="pill purple">${esc(s)}</span>`;
+    if(s.includes("미등록")||s.includes("점검안함"))return`<span class="pill bad">${esc(s)}</span>`;
+    if(s==="앱 미가입")return`<span class="pill blue">${esc(s)}</span>`;
+    return`<span class="pill gray">${esc(s)}</span>`;
+  }
+
+  function statusOf(memberId,date){
+    const r=recs(memberId)[date];
+    if(r){
+      if(r.status==="normal") return r.late?"정상·지연":"완료";
+      if(r.status==="not_driving") return r.late?"미운행·지연":"미운행";
+      if(r.status==="issue") return r.late?"이상·지연":"이상";
+    }
+    if(activeEvent(memberId,date,"inspection_not_performed")) return "점검안함 확인";
+    const m=member(memberId);
+    if(!m?.joined) return "앱 미가입";
+    if(!m?.trackingStart || date<m.trackingStart) return "대상아님";
+    return date<=TODAY()?"점검 미등록":"";
+  }
+
+  function missingDates(memberId,limit=999){
+    const m=member(memberId); if(!m?.joined||!m.trackingStart)return[];
+    const out=[]; let d=shift(TODAY(),-1), count=0;
+    while(d>=m.trackingStart && count<400){
+      if(!recs(memberId)[d] && !activeEvent(memberId,d,"inspection_not_performed")) out.push(d);
+      d=shift(d,-1);count++;
+    }
+    return out.slice(0,limit);
+  }
+
+  function groupsHtml(withChecks=false){
+    const groups=["외관점검","상태점검","기타"];
+    return `<div class="check-groups">${groups.map(g=>`
+      <div class="check-group"><div class="group-title">${g}</div>
+      ${ITEMS.map((it,i)=>({it,i})).filter(x=>x.it.group===g).map(({it,i})=>`
+        <label class="check-item">${withChecks?`<input type="checkbox" class="issue-check" value="${i}">`:`<b>${i+1}.</b>`}<span>${esc(it.label)}</span></label>`).join("")}
+      </div>`).join("")}</div>`;
+  }
+
+  function setMode(mode){
+    S.mode=mode;save();
+    $("#driverModeBtn").classList.toggle("active",mode==="driver");
+    $("#adminModeBtn").classList.toggle("active",mode==="admin");
+    if(mode==="driver")renderDriver();else renderAdmin();
+  }
+
+  /* DRIVER */
+  function renderDriver(){
+    $("#app").className="app-shell";
+    const m=driverMember();
+    if(!S.driver.registered){
+      if(S.driver.step==="lookup")return renderLookup();
+      if(S.driver.step==="address")return renderAddressConfirm();
+      if(S.driver.step==="pin")return renderPinSetup();
+    }
+    if(!S.driver.loggedIn)return renderDriverLogin();
+    if(S.driver.completionDate===TODAY())return renderCompletion();
+    renderDriverHome();
+  }
+
+  function renderLookup(){
+    $("#app").innerHTML=`<div class="driver-shell"><div class="card card-pad hero">
+      <div class="between"><div><span class="pill purple">최초 1회 등록</span><h1 class="section">차량번호와 이름을<br>입력해 주세요.</h1><p class="muted">전체면허자 명부의 회원정보와 대조합니다.</p></div>${truckSvg()}</div>
+      <div class="field"><label>차량번호</label><input id="lookupVehicle" placeholder="예: 강원81자1234호"></div>
+      <div class="field"><label>이름</label><input id="lookupName" placeholder="성명"></div>
+      <div class="stack"><button class="btn btn-primary btn-full" data-act="lookup">확인하기</button><button class="btn btn-soft btn-full" data-act="demo-fill">데모정보 자동입력</button></div>
+      <p class="small section">데모: 홍길동 / 강원81자1234호</p>
+    </div></div>`;
+  }
+  function renderAddressConfirm(){
+    const m=driverMember();
+    $("#app").innerHTML=`<div class="driver-shell"><div class="card card-pad">
+      <span class="pill ok">회원정보 확인 완료</span><h1 class="section">${esc(m.name)} 기사님 맞습니까?</h1>
+      <div class="info"><b>${esc(m.vehicle)}</b><br>${esc(m.address)}</div>
+      <div class="stack section"><button class="btn btn-primary" data-act="address-ok">예, 맞습니다</button><button class="btn btn-ghost" data-act="address-change">주소가 변경되었습니다</button><button class="btn btn-ghost" data-act="lookup-back">이전</button></div>
+    </div></div>`;
+  }
+  function renderPinSetup(){
+    $("#app").innerHTML=`<div class="driver-shell"><div class="card card-pad">
+      <span class="pill purple">마지막 단계</span><h1 class="section">4자리 PIN을 설정해 주세요.</h1>
+      <p class="muted">최초 등록 후에는 이 기기를 신뢰기기로 등록해 앱 실행 즉시 오늘 점검 화면으로 들어갑니다.</p>
+      <div class="field"><label>새 PIN</label><input id="pin1" inputmode="numeric" maxlength="4" type="password"></div>
+      <div class="field"><label>PIN 확인</label><input id="pin2" inputmode="numeric" maxlength="4" type="password"></div>
+      <button class="btn btn-primary btn-full" data-act="pin-save">등록 완료</button>
+    </div></div>`;
+  }
+  function renderDriverLogin(){
+    const m=driverMember();
+    $("#app").innerHTML=`<div class="driver-shell"><div class="card card-pad">
+      <h1>다시 로그인</h1><p class="muted">새 기기·로그아웃·PIN 초기화 후 사용하는 화면입니다.</p>
+      <div class="field"><label>차량번호</label><input id="loginVehicle" value="${esc(m.vehicle)}"></div>
+      <div class="field"><label>4자리 PIN</label><input id="loginPin" inputmode="numeric" maxlength="4" type="password"></div>
+      ${m.pinState==="reset_required"?`<div class="notice">관리자가 PIN을 초기화했습니다. 새 PIN 등록이 필요합니다.</div>`:""}
+      <div class="stack section"><button class="btn btn-primary" data-act="${m.pinState==="reset_required"?"reset-pin-driver":"driver-login"}">${m.pinState==="reset_required"?"새 PIN 설정":"로그인"}</button></div>
+    </div></div>`;
+  }
+
+  function renderDriverHome(){
+    const m=driverMember(),t=TODAY(),r=recs(m.id)[t],miss=missingDates(m.id,5);
+    $("#app").innerHTML=`<div class="driver-shell">
+      <div class="card card-pad hero">
+        <div class="between"><div><div class="muted">${esc(m.name)} · ${esc(m.vehicle)}</div><h1>${fmt(t)}</h1></div>${truckSvg()}</div>
+        <div class="member-info-card section">
+          <div class="member-info-title"><span>👤</span><b>운수종사자 정보</b></div>
+          <div class="info-line"><span>운수종사자명</span><b>${esc(m.name)}</b></div>
+          <div class="info-line"><span>차량번호</span><b>${esc(m.vehicle)}</b></div>
+          <div class="info-line"><span>차종</span><b>${esc(m.vehicleType)}</b></div>
+          <div class="info-line"><span>휴대폰번호</span><b>${esc(m.phone)}</b></div>
+          <div class="info-line"><span>주소</span><b>${esc(m.address)}</b></div>
+        </div>
+        ${r?`<div class="success"><b>✓ 오늘 점검 완료</b><br><span class="small">${esc(statusOf(m.id,t))} · ${esc(r.time)}</span></div>
+             <div class="grid2 section"><button class="btn btn-soft" data-act="record" data-date="${t}">오늘 기록 보기</button><button class="btn btn-ghost" data-act="legal-form">오늘이 포함된 점검표</button></div>`
+          :`<p class="muted">운행 전 차량 상태를 확인해 주세요.</p><button class="btn btn-primary btn-full big-action" data-act="inspect" data-date="${t}">오늘 점검하기</button>`}
+      </div>
+      <div class="card card-pad section">
+        <div class="between"><h2>과거 점검 미등록</h2>${badge(`${missingDates(m.id).length}건`)}</div>
+        ${miss.length?`<div class="stack">${miss.map(d=>`<button class="btn btn-ghost between" data-act="missing-day" data-date="${d}"><span>${fmt(d)}</span><b>처리하기</b></button>`).join("")}</div>`:`<div class="success">처리할 과거 점검 미등록일이 없습니다.</div>`}
+        <button class="btn btn-soft btn-full section" data-act="missing-all">과거 미등록 전체보기</button>
+      </div>
+      <div class="stack section">
+        <button class="btn btn-primary btn-full" data-act="monthly">내 점검표 보기</button>
+        <button class="btn btn-ghost btn-full" data-act="profile">내 정보</button>
+      </div>
+      <div class="card card-pad section">
+        <div class="between"><div><b>데모 테스트 도구</b><div class="small">실제 운영 앱에는 표시하지 않을 영역</div></div><span class="pill gray">DEMO</span></div>
+        <div class="grid2 section"><button class="btn btn-soft" data-act="seed-history">과거 20일 데모데이터</button><button class="btn btn-ghost" data-act="driver-logout">로그아웃 테스트</button></div>
+      </div>
+    </div>`;
+  }
+
+  function showInspection(date){
+    openModal(`${fmt(date)} 일상점검`,`
+      <div class="info"><b>운행 전에 실제 차량을 확인한 후 입력하세요.</b></div>
+      <div class="section">${groupsHtml(false)}</div>
+      <div class="stack section">
+        <button class="btn btn-ok" data-act="save-inspection" data-date="${date}" data-status="normal">전체 항목 양호</button>
+        <button class="btn btn-warn" data-act="issue-start" data-date="${date}">문제 있는 항목 선택</button>
+        <button class="btn btn-ghost" data-act="save-inspection" data-date="${date}" data-status="not_driving">${date===TODAY()?"오늘":"해당 날짜"} 미운행</button>
+      </div>`);
+  }
+
+  function showIssue(date){
+    openModal(`${fmt(date)} 이상 항목 선택`,`
+      <p class="muted">불량인 항목을 모두 선택하고 조치내용을 입력하세요.</p>
+      ${groupsHtml(true)}
+      <div class="field"><label>불량상태 / 조치내용</label><textarea id="issueNote" rows="4" placeholder="예: 14일 창닦이기 불량 - 14일 창닦이기 교체"></textarea></div>
+      <button class="btn btn-warn btn-full" data-act="issue-save" data-date="${date}">이상 상태 저장</button>`);
+  }
+
+  function saveInspection(date,status,issues=[]){
+    const m=driverMember();
+    if(activeEvent(m.id,date,"inspection_not_performed") && status!=="not_driving"){alert("이미 '실제 점검하지 않음' 확인이 남아 있습니다. 협회 관리자가 오입력 취소 처리한 뒤 입력할 수 있습니다.");return}
+    if(recs(m.id)[date]){alert("이미 기록이 있습니다.");return}
+    recs(m.id)[date]={status,issues,late:date<TODAY(),time:time(),enteredAt:now(),entryChannel:"driver",revisions:1};
+    save();closeModal();S.driver.completionDate=date;save();renderDriver();
+  }
+
+  function renderCompletion(){
+    const m=driverMember(),date=S.driver.completionDate,r=recs(m.id)[date];
+    $("#app").innerHTML=`<div class="driver-shell"><div class="card complete-hero">
+      <div class="complete-icon">✓</div><h1>${date===TODAY()?"오늘 점검이 완료되었습니다!":"과거 기록이 저장되었습니다."}</h1>
+      <p class="muted">${fmt(date)} · ${esc(statusOf(m.id,date))}${r?.late?" · 지연입력":""}</p>
+      <div class="stack section"><button class="btn btn-primary" data-act="record" data-date="${date}">점검 기록 보기</button><button class="btn btn-soft" data-act="monthly">내 점검표 보기</button><button class="btn btn-ghost" data-act="completion-home">홈으로</button></div>
+    </div></div>`;
+  }
+
+  function showMissingDay(date){
+    openModal(`${fmt(date)} 점검 미등록`,`
+      <div class="danger">이 날짜에는 전자 일상점검 기록이 없습니다.</div>
+      <div class="stack section">
+        <button class="btn btn-ghost" data-act="save-inspection" data-date="${date}" data-status="not_driving">그날 운행하지 않았습니다</button>
+        <button class="btn btn-primary" data-act="inspect" data-date="${date}">실제 점검은 했지만 입력을 못 했습니다</button>
+        <button class="btn btn-danger" data-act="not-performed" data-date="${date}">실제 점검을 하지 않았습니다</button>
+      </div>
+      <p class="small section">과거 날짜에 저장하면 실제 입력시각과 지연입력 여부가 따로 보존됩니다.</p>`);
+  }
+
+  function showMissingAll(){
+    const m=driverMember(),list=missingDates(m.id);
+    openModal("과거 점검 미등록 전체보기",`
+      <div class="between"><div><b>${list.length}건</b><div class="small">tracking_start_date 이후 기준</div></div><button class="btn btn-sm btn-soft" data-act="monthly">월간 달력</button></div>
+      <div class="stack section">${list.length?list.map(d=>`<button class="btn btn-ghost between" data-act="missing-day" data-date="${d}"><span>${fmt(d)}</span><b>처리</b></button>`).join(""):`<div class="success">미등록일이 없습니다.</div>`}</div>`);
+  }
+
+  function showRecord(memberId,date,admin=false){
+    const r=recs(memberId)[date],m=member(memberId),ev=activeEvent(memberId,date,"inspection_not_performed");
+    if(!r&&!ev){if(admin)return showAdminDay(memberId,date);return showMissingDay(date)}
+    openModal(`${m.name} · ${fmt(date)}`,`
+      ${r?`<div class="success"><b>${esc(statusOf(memberId,date))}</b></div>
+        <div class="section"><b>점검결과</b><p>${r.status==="normal"?"전체 양호":r.status==="not_driving"?"미운행":"이상 있음"}</p></div>
+        ${r.issues?.length?`<div class="section"><b>불량 항목</b>${r.issues.map(x=>`<div class="notice section">${x.idx+1}. ${esc(ITEMS[x.idx].label)}<br><span class="small">${esc(x.note||"")}</span></div>`).join("")}</div>`:""}
+        <div class="small section">점검 대상일 ${date}<br>실제 입력 ${esc(r.time)}<br>입력경로 ${r.entryChannel==="admin_proxy"?"관리자 대리입력":"기사 본인"}<br>지연입력 ${r.late?"예":"아니오"}${r.proxyReason?`<br>대리입력 사유 ${esc(r.proxyReason)}`:""}</div>`
+      :`<div class="danger"><b>점검 미등록</b><br>기사 본인이 '실제 점검하지 않음'을 확인했습니다.</div><p class="small section">확인시각: ${new Date(ev.at).toLocaleString("ko-KR")}</p>`}
+      ${admin&&ev?`<button class="btn btn-danger btn-full section" data-act="void-not-performed" data-event="${ev.id}">오입력 취소(void) 처리</button>`:""}
+    `);
+  }
+
+  function monthSummary(memberId,y,m){
+    const prefix=`${y}-${String(m).padStart(2,"0")}`,days=new Date(y,m,0).getDate();
+    let normal=0,off=0,issue=0,late=0,missing=0;
+    for(let d=1;d<=days;d++){
+      const ds=`${prefix}-${String(d).padStart(2,"0")}`; if(ds>TODAY())continue;
+      const r=recs(memberId)[ds]; if(r){if(r.status==="normal")normal++;if(r.status==="not_driving")off++;if(r.status==="issue")issue++;if(r.late)late++}
+      else if(statusOf(memberId,ds)==="점검 미등록")missing++;
+    }
+    return{normal,off,issue,late,missing};
+  }
+
+  function calendarHtml(memberId,y,m,admin=false){
+    const days=new Date(y,m,0).getDate(),first=new Date(y,m-1,1).getDay();
+    let html=["일","월","화","수","목","금","토"].map(x=>`<div class="cal-head">${x}</div>`).join("");
+    for(let i=0;i<first;i++)html+="<div></div>";
+    for(let d=1;d<=days;d++){
+      const ds=`${y}-${String(m).padStart(2,"0")}-${String(d).padStart(2,"0")}`,s=statusOf(memberId,ds);
+      let cls="",mark="";
+      if(s==="완료"){cls="ok";mark="✓"} else if(s==="미운행"){cls="gray";mark="미"} else if(s.includes("지연")){cls="purple";mark=s.includes("미운행")?"미·지연":"지연"}
+      else if(s.includes("이상")){cls="warn";mark="이상"} else if(s==="점검 미등록"){cls="bad";mark="미등록"} else if(s==="점검안함 확인"){cls="bad";mark="점검안함"}
+      html+=`<div class="cal-day ${cls} ${ds<=TODAY()?"clickable":""}" ${ds<=TODAY()?`data-act="${admin?"admin-day":"calendar-day"}" data-member="${memberId}" data-date="${ds}"`:""}><b>${d}</b><span class="cal-mark">${mark}</span></div>`;
+    }
+    return html;
+  }
+
+  function showMonthly(memberId=driverMember().id,admin=false,ym=monthKey()){
+    const [y,m]=ym.split("-").map(Number),sum=monthSummary(memberId,y,m);
+    openModal(admin?`${member(memberId).name} 월간 이력`:"내 일상점검표",`
+      <div class="grid2"><div class="field"><label>연도</label><select id="calYear">${[y-1,y,y+1].map(v=>`<option ${v===y?"selected":""}>${v}</option>`).join("")}</select></div>
+      <div class="field"><label>월</label><select id="calMonth">${Array.from({length:12},(_,i)=>i+1).map(v=>`<option ${v===m?"selected":""}>${v}</option>`).join("")}</select></div></div>
+      <div class="summary-mini"><div class="mini">완료<b>${sum.normal}</b></div><div class="mini">미운행<b>${sum.off}</b></div><div class="mini">이상<b>${sum.issue}</b></div><div class="mini">지연<b>${sum.late}</b></div><div class="mini">미등록<b>${sum.missing}</b></div></div>
+      <div class="legend section">${badge("완료")}${badge("미운행")}${badge("이상")}${badge("지연입력")}${badge("점검 미등록")}</div>
+      <div class="calendar section" id="monthCalendar">${calendarHtml(memberId,y,m,admin)}</div>
+      <div class="grid2 section"><button class="btn btn-primary" data-act="calendar-refresh" data-member="${memberId}" data-admin="${admin?1:0}">연월 변경</button><button class="btn btn-soft" data-act="legal-form" data-member="${memberId}" data-ym="${y}-${String(m).padStart(2,"0")}">법정 점검표 보기</button></div>
+    `);
+  }
+
+  function showProfile(){
+    const m=driverMember();
+    openModal("내 정보",`
+      <div class="member-info-card">
+        <div class="member-info-title"><span>👤</span><b>운수종사자 정보</b></div>
+        <div class="info-line"><span>운수종사자명</span><b>${esc(m.name)}</b></div>
+        <div class="info-line"><span>차량번호</span><b>${esc(m.vehicle)}</b></div>
+        <div class="info-line"><span>차종</span><b>${esc(m.vehicleType)}</b></div>
+        <div class="info-line"><span>휴대폰번호</span><b>${esc(m.phone)}</b></div>
+        <div class="info-line"><span>주소</span><b>${esc(m.address)}</b></div>
+      </div>
+      <div class="section"><span class="small">전자점검 관리 시작일</span><br><b>${esc(m.trackingStart||"-")}</b></div>
+      ${S.addressRequests.find(x=>x.memberId===m.id&&x.status==="pending")?`<div class="notice section">주소변경 요청이 승인 대기 중입니다.</div>`:""}
+      <div class="stack section"><button class="btn btn-ghost" data-act="address-change">주소 변경 요청</button><button class="btn btn-ghost" data-act="driver-logout">로그아웃</button><button class="btn btn-danger" data-act="reset-demo">데모 전체 초기화</button></div>`);
+  }
+
+  /* OFFICIAL FORM */
+  function legalCell(memberId,date,itemIdx){
+    const r=recs(memberId)[date]; if(!r)return"";
+    if(r.status==="not_driving")return"미";
+    if(r.status==="normal")return"○";
+    return r.issues.some(x=>x.idx===itemIdx)?"×":"○";
+  }
+  function legalHtml(memberId,ym){
+    const m=member(memberId),[y,mo]=ym.split("-").map(Number),days=new Date(y,mo,0).getDate();
+    const dayHeaders=Array.from({length:31},(_,i)=>`<th class="day-col">${i+1}</th>`).join("");
+    const groups=["외관점검","상태점검","기타"];
+    let rows="";
+    for(const g of groups){
+      const entries=ITEMS.map((it,i)=>({it,i})).filter(x=>x.it.group===g);
+      entries.forEach(({it,i},idx)=>{
+        rows+=`<tr>${idx===0?`<td class="category" rowspan="${entries.length}">${g}</td>`:""}<td class="item-col">${esc(it.label)}</td>`;
+        for(let d=1;d<=31;d++){
+          const date=`${y}-${String(mo).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+          rows+=`<td class="symbol">${d<=days?legalCell(memberId,date,i):""}</td>`;
+        }
+        rows+="</tr>";
+      });
+    }
+    let sign=`<tr><td class="sign-label" colspan="2">점검자 확인(서명)</td>`;
+    for(let d=1;d<=31;d++){
+      const date=`${y}-${String(mo).padStart(2,"0")}-${String(d).padStart(2,"0")}`,r=recs(memberId)[date];
+      sign+=`<td>${r?"홍":""}</td>`;
+    }
+    sign+="</tr>";
+    const actionNotes=[];
+    for(let d=1;d<=days;d++){
+      const date=`${y}-${String(mo).padStart(2,"0")}-${String(d).padStart(2,"0")}`,r=recs(memberId)[date];
+      if(r?.status==="issue")for(const it of r.issues) actionNotes.push(`${d}일 ${ITEMS[it.idx].label} - ${it.note||"조치내용 확인"}`);
+    }
+    return `<div class="legal-paper">
+      <div class="legal-note">■ 화물자동차 운수사업법 시행규칙 [별지 제14호의5서식] &lt;신설 2025. 12. 29.&gt; &nbsp; [시행일: 2026. 6. 30.]</div>
+      <div class="legal-title">운수종사자 일상점검표</div>
+      <table class="legal-meta"><tr>
+        <th style="width:13%">점검연월</th><td style="width:15%">${y}년 ${mo}월</td>
+        <th style="width:13%">운송사업자명</th><td style="width:19%">${esc(m.businessName||m.name)}</td>
+        <th style="width:12%">차량번호</th><td style="width:14%">${esc(m.vehicle)}</td>
+        <th style="width:12%">운수종사자명</th><td style="width:14%">${esc(m.name)}</td>
+      </tr></table>
+      <table class="legal-table" style="margin-top:3mm">
+        <colgroup><col style="width:8mm"><col style="width:47mm">${Array.from({length:31},()=>'<col style="width:6.3mm">').join("")}</colgroup>
+        <tr><th colspan="2" rowspan="2">점검항목</th><th class="result-title" colspan="31">점검결과(양호 ○, 불량 ×, 미운행시 “미” 기입)</th></tr>
+        <tr>${dayHeaders}</tr>
+        ${rows}${sign}
+        <tr><td class="action-label" colspan="2">불량상태 조치 기록</td><td class="action-text" colspan="31">${actionNotes.length?actionNotes.map(esc).join(" / "):"(예시) 00일 창닦이기 불량 - 00일 창닦이기 교체"}</td></tr>
+      </table>
+    </div>`;
+  }
+  function showLegal(memberId=driverMember().id,ym=monthKey()){
+    const html=legalHtml(memberId,ym);
+    openModal(`${ym} 법정 일상점검표`,`
+      <div class="info"><b>국가 별지 제14호의5서식 구조로 출력합니다.</b><br><span class="small">인쇄 버튼 → 프린터 또는 'PDF로 저장'을 선택하세요.</span></div>
+      <div class="legal-screen section">${html}</div>
+      <button class="btn btn-primary btn-full section" data-act="print-legal" data-member="${memberId}" data-ym="${ym}">인쇄 / PDF 저장</button>
+      <div class="source-link">공식 서식 기준: 국가법령정보센터 별지 제14호의5서식</div>`);
+  }
+  function printLegal(memberId,ym){
+    $("#printRoot").innerHTML=legalHtml(memberId,ym); setTimeout(()=>window.print(),50);
+  }
+
+  /* ADMIN */
+  function renderAdmin(){
+    $("#app").className="app-shell";
+    if(!S.adminSession)return renderAdminLogin();
+    renderAdminView(S.adminView||"dashboard");
+  }
+  function renderAdminLogin(){
+    $("#app").innerHTML=`<div class="admin-login"><div class="card card-pad">
+      <span class="pill purple">협회 관리자</span><h1 class="section">관리자 로그인</h1>
+      <div class="field"><label>아이디</label><input id="adminId" value="admin"></div>
+      <div class="field"><label>비밀번호</label><input id="adminPw" type="password" value="1234"></div>
+      <div class="field"><label>TOTP 6자리</label><input id="adminTotp" inputmode="numeric" maxlength="6" value="000000"></div>
+      <button class="btn btn-primary btn-full" data-act="admin-login">로그인</button>
+      <p class="small section">데모 계정: admin / 1234 / TOTP 000000</p>
+    </div></div>`;
+  }
+
+  const nav=[
+    ["dashboard","오늘 현황"],["members","회원별 점검이력"],["missing","점검 미등록 관리"],["issues","이상차량"],
+    ["forms","전자 점검표"],["changes","회원정보 변경요청"],["imports","회원명부 업데이트"],["security","계정·보안"],
+    ["audit","관리자 처리이력"],["settings","시스템 설정"]
+  ];
+  function adminShell(view,body){
+    $("#app").innerHTML=`<div class="admin-layout"><aside class="card admin-side no-print">
+      ${nav.map(([k,l])=>`<button class="${view===k?"active":""}" data-act="admin-nav" data-view="${k}">${l}</button>`).join("")}
+      <hr style="border:0;border-top:1px solid var(--line);margin:10px 0"><button data-act="admin-logout">관리자 로그아웃</button>
+    </aside><section>${body}</section></div>`;
+  }
+  function dashboardStats(date=TODAY()){
+    const active=S.members.filter(m=>m.active),joined=active.filter(m=>m.joined),unjoined=active.filter(m=>!m.joined);
+    let done=0,missing=0,off=0,issue=0,late=0;
+    for(const m of joined){
+      const r=recs(m.id)[date];
+      if(r){if(r.status==="normal")done++;if(r.status==="not_driving")off++;if(r.status==="issue")issue++;if(r.late)late++}
+      else if(m.trackingStart&&date>=m.trackingStart&&date<=TODAY())missing++;
+    }
+    return{active:active.length,joined:joined.length,unjoined:unjoined.length,done,missing,off,issue,late};
+  }
+  function dashboardRows(filter=""){
+    return S.members.filter(m=>m.active).map(m=>({m,status:statusOf(m.id,TODAY()),time:recs(m.id)[TODAY()]?.time||"-"}))
+      .filter(x=>!filter||x.status.includes(filter));
+  }
+  function renderAdminView(view){
+    S.adminView=view;save();
+    if(view==="members")return renderMembersAdmin();
+    if(view==="missing")return renderMissingAdmin();
+    if(view==="issues")return renderIssuesAdmin();
+    if(view==="forms")return renderFormsAdmin();
+    if(view==="changes")return renderChangesAdmin();
+    if(view==="imports")return renderImportsAdmin();
+    if(view==="security")return renderSecurityAdmin();
+    if(view==="audit")return renderAuditAdmin();
+    if(view==="settings")return renderSettingsAdmin();
+    renderDashboard();
+  }
+  function metricsHtml(st){
+    const cards=[["전체 유효회원",st.active,""],["앱 가입",st.joined,""],["앱 미가입",st.unjoined,"앱 미가입"],["오늘 완료",st.done,"완료"],["점검 미등록",st.missing,"점검 미등록"],["미운행",st.off,"미운행"],["이상",st.issue,"이상"],["지연입력",st.late,"지연"]];
+    return `<div class="metric-grid">${cards.map(([l,n,f])=>`<div class="metric" data-act="dash-filter" data-filter="${f}"><span>${l}</span><b>${n}</b></div>`).join("")}</div>`;
+  }
+  function memberTable(rows){
+    return `<div class="table-wrap"><table class="data-table"><thead><tr><th>이름</th><th>차량번호</th><th>전화</th><th>오늘 상태</th><th>입력시각</th><th></th></tr></thead><tbody id="memberTableBody">
+      ${rows.map(({m,status,time})=>`<tr data-search="${esc((m.name+" "+m.vehicle+" "+m.vehicleType+" "+m.phone+" "+m.memberNo+" "+m.qualificationCertificateNo).toLowerCase())}" data-status="${esc(status)}"><td><b>${esc(m.name)}</b></td><td>${esc(m.vehicle)}</td><td>${esc(m.phone)}</td><td>${badge(status)}</td><td>${esc(time)}</td><td><button class="link-btn" data-act="member-detail" data-member="${m.id}">상세</button></td></tr>`).join("")}
+    </tbody></table></div>`;
+  }
+  function renderDashboard(filter=""){
+    const st=dashboardStats(),rows=dashboardRows(filter);
+    adminShell("dashboard",`<div class="between"><div><h1>오늘 점검 현황</h1><p class="muted">${fmt(TODAY())} · ${esc(S.adminSession.name)}</p></div><span class="pill purple">${esc(S.adminSession.role)}</span></div>
+      ${metricsHtml(st)}
+      <div class="toolbar"><input id="memberSearch" placeholder="이름 / 차량번호 / 차종 / 전화 / 관리번호 / 자격증명발급번호"><select id="statusFilter"><option value="">전체 상태</option><option>완료</option><option>점검 미등록</option><option>미운행</option><option>이상</option><option>지연</option><option>앱 미가입</option></select><button class="btn btn-soft btn-sm" data-act="admin-refresh">새로고침</button></div>
+      ${memberTable(rows)}`);
+  }
+  function renderMembersAdmin(){adminShell("members",`<h1>회원별 점검이력</h1><p class="muted">회원 상세, 월간 달력, 날짜별 기록, 법정 점검표를 조회합니다.</p>${memberTable(dashboardRows())}`)}
+  function renderMissingAdmin(){const rows=dashboardRows().filter(x=>x.status==="점검 미등록");adminShell("missing",`<h1>점검 미등록 관리</h1><p class="muted">앱 미가입자는 제외합니다. 가입 완료 + tracking_start_date 이후 + 해당 날짜 기록 없음만 표시합니다.</p>${memberTable(rows)}`)}
+  function renderIssuesAdmin(){const rows=dashboardRows().filter(x=>x.status.includes("이상"));adminShell("issues",`<h1>이상차량</h1><p class="muted">불량 항목이 등록된 차량입니다.</p>${memberTable(rows)}`)}
+  function renderFormsAdmin(){adminShell("forms",`<h1>전자 점검표</h1><div class="card card-pad"><div class="field"><label>회원</label><select id="formMember">${S.members.filter(m=>m.active).map(m=>`<option value="${m.id}">${esc(m.name)} · ${esc(m.vehicle)}</option>`).join("")}</select></div><div class="field"><label>연월</label><input id="formYm" type="month" value="${monthKey()}"></div><button class="btn btn-primary" data-act="admin-form-open">법정 점검표 보기</button></div>`)}
+  function renderChangesAdmin(){
+    const list=S.addressRequests.filter(x=>x.status==="pending");
+    adminShell("changes",`<div class="between"><div><h1>회원정보 변경요청</h1><p class="muted">기사 주소변경 요청을 승인/반려합니다.</p></div>${badge(`${list.length}건`)}</div>
+      <div class="stack">${list.length?list.map(r=>{const m=member(r.memberId);return`<div class="card card-pad"><div class="between"><div><b>${esc(m.name)} · ${esc(m.vehicle)}</b><p class="small">기존: ${esc(r.oldValue)}<br>요청: ${esc(r.newValue)}</p></div><div class="row"><button class="btn btn-ok btn-sm" data-act="change-approve" data-id="${r.id}">승인</button><button class="btn btn-danger btn-sm" data-act="change-reject" data-id="${r.id}">반려</button></div></div></div>`}).join(""):`<div class="success">대기 중인 요청이 없습니다.</div>`}</div>`);
+  }
+  function renderImportsAdmin(){
+    const last=S.importBatches[0];
+    adminShell("imports",`<h1>회원명부 업데이트</h1><p class="muted">전체면허자 시스템은 수정하지 않고, 내려받은 최신 명부와 현재 일상점검 명부의 차이만 검토합니다.</p>
+      <div class="card card-pad">
+        <div class="field"><label>가져오기 방식</label><select id="importType"><option value="full_snapshot">전체 명부(full_snapshot)</option><option value="partial_update">부분 변경(partial_update)</option></select></div>
+        <div class="field"><label>Excel 파일</label><input id="importFile" type="file" accept=".xlsx,.xls,.csv"></div>
+        <button class="btn btn-primary btn-full" data-act="import-preview">업로드 · 비교 미리보기</button>
+        <div id="importPreview" class="section">${last?importPreviewHtml(last):""}</div>
+      </div>`);
+  }
+  function importPreviewHtml(b){
+    return `<div class="info"><b>${esc(b.filename)}</b> · ${esc(b.type)}</div><div class="summary-mini section"><div class="mini">신규<b>${b.counts.new}</b></div><div class="mini">변경<b>${b.counts.changed}</b></div><div class="mini">상태변경<b>${b.counts.status}</b></div><div class="mini">동일<b>${b.counts.same}</b></div><div class="mini">확인필요<b>${b.counts.review}</b></div></div>
+      <div class="table-wrap section"><table class="data-table"><thead><tr><th>구분</th><th>회원</th><th>차량번호</th><th>차이</th><th>처리</th></tr></thead><tbody>
+      ${b.rows.map(r=>`<tr><td>${badge(r.kind)}</td><td>${esc(r.name)}</td><td>${esc(r.vehicle)}</td><td>${esc(r.diff)}</td><td>${esc(r.decision)}</td></tr>`).join("")}</tbody></table></div>
+      <button class="btn btn-ok btn-full section" data-act="import-apply" data-id="${b.id}">검토 후 차이 반영</button><p class="small section">full_snapshot만 '파일에 없음 → inactive 후보'를 만들 수 있습니다. partial_update는 파일에 없는 회원을 건드리지 않습니다.</p>`;
+  }
+  function renderSecurityAdmin(){
+    adminShell("security",`<h1>계정·보안</h1>
+      <div class="grid2">
+        <div class="card card-pad"><h2>관리자 2단계 인증</h2>${S.adminUsers.map(u=>`<div class="between" style="padding:8px 0;border-bottom:1px solid #edf0f3"><span>${esc(u.name)} · ${esc(u.role)}</span>${badge(u.totp?"TOTP 사용":"TOTP 미사용")}</div>`).join("")}</div>
+        <div class="card card-pad"><h2>로그인 잠금</h2>${S.lockouts.length?S.lockouts.map(l=>`<div class="between" style="padding:8px 0"><span>${esc(l.scope)} · ${esc(l.target)}</span><button class="btn btn-sm btn-ghost" data-act="lockout-release" data-id="${l.id}">해제</button></div>`).join(""):`<div class="success">현재 잠금 없음</div>`}</div>
+      </div>
+      <div class="card card-pad section"><h2>PIN 정책</h2><p class="small">신뢰기기 5회 실패 → 5/15/60/360분 단계 잠금 · 비신뢰기기 시간당 10회 → 15/60분 · 다수 회원을 시도하는 IP 별도 제한 · 기사 세션 기본 ${S.settings.sessionTtlDays}일 · 최대 기기 ${S.settings.maxDevices}대</p></div>`);
+  }
+  function renderAuditAdmin(){adminShell("audit",`<h1>관리자 처리이력</h1><div class="card card-pad">${S.auditLogs.length?S.auditLogs.map(a=>`<div class="audit-row"><div class="between"><b>${esc(a.action)}</b><span class="small">${esc(a.at)}</span></div><div class="small">${esc(a.admin)} · ${esc(a.target)} · ${esc(a.detail)}</div>${a.before||a.after?`<div class="small">전: ${esc(JSON.stringify(a.before))}<br>후: ${esc(JSON.stringify(a.after))}</div>`:""}</div>`).join(""):`<div class="muted">기록이 없습니다.</div>`}</div>`)}
+  function renderSettingsAdmin(){
+    const s=S.settings;
+    adminShell("settings",`<h1>시스템 설정</h1><div class="card card-pad">
+      <div class="field"><label>과거 지연입력</label><select id="setLateMode"><option value="unlimited" ${s.lateEntryMode==="unlimited"?"selected":""}>제한 없음</option><option value="days" ${s.lateEntryMode==="days"?"selected":""}>일수 제한</option><option value="admin_only" ${s.lateEntryMode==="admin_only"?"selected":""}>관리자만</option></select></div>
+      <div class="field"><label>허용 일수</label><input id="setLateDays" type="number" value="${s.lateEntryDays??""}" placeholder="예: 30"></div>
+      <label class="check-item"><input id="setSameEdit" type="checkbox" ${s.driverSameDayEdit?"checked":""}>기사 당일 수정 허용</label>
+      <label class="check-item"><input id="setAdminCorr" type="checkbox" ${s.adminCorrection?"checked":""}>관리자 정정 허용</label>
+      <label class="check-item"><input id="setStaffTotp" type="checkbox" ${s.staffTotpRequired?"checked":""}>staff 관리자 TOTP 필수</label>
+      <div class="grid2 section"><div class="field"><label>기사 세션 TTL(일)</label><input id="setTtl" type="number" value="${s.sessionTtlDays}"></div><div class="field"><label>회원당 활성기기</label><input id="setDevices" type="number" value="${s.maxDevices}"></div></div>
+      <button class="btn btn-primary" data-act="settings-save">설정 저장</button>
+    </div>`);
+  }
+
+  function showMemberDetail(memberId){
+    const m=member(memberId),sum=monthSummary(m.id,...monthKey().split("-").map(Number));
+    openModal(`${m.name} · ${m.vehicle}`,`
+      <div class="admin-detail-grid">
+        <div class="member-info-card">
+          <div class="member-info-title"><span>👤</span><b>운수종사자 정보</b></div>
+          <div class="info-line"><span>운수종사자명</span><b>${esc(m.name)}</b></div>
+          <div class="info-line"><span>차량번호</span><b>${esc(m.vehicle)}</b></div>
+          <div class="info-line"><span>차종</span><b>${esc(m.vehicleType)}</b></div>
+          <div class="info-line"><span>휴대폰번호</span><b>${esc(m.phone)}</b></div>
+          <div class="info-line"><span>주소</span><b>${esc(m.address)}</b></div>
+        </div>
+        <div>
+          <div class="admin-only-card">
+            <div class="admin-only-title">🔒 관리자 전용 정보 <span>일반 사용자에게 비공개</span></div>
+            <div class="info-line"><span>관리번호</span><b>${esc(m.memberNo||"-")}</b></div>
+            <div class="info-line"><span>자격증명발급번호</span><b>${esc(m.qualificationCertificateNo||"-")}</b></div>
+          </div>
+          <div class="card card-pad section" style="box-shadow:none"><div>${badge(m.active?"활성":"비활성")} ${badge(m.joined?"앱 가입":"앱 미가입")}</div><p class="small section">전자점검 시작일: ${esc(m.trackingStart||"-")}<br>PIN 상태: ${esc(m.pinState)}</p></div>
+        </div>
+      </div>
+      <div class="summary-mini section"><div class="mini">완료<b>${sum.normal}</b></div><div class="mini">미운행<b>${sum.off}</b></div><div class="mini">이상<b>${sum.issue}</b></div><div class="mini">지연<b>${sum.late}</b></div><div class="mini">미등록<b>${sum.missing}</b></div></div>
+      <div class="stack section">
+        <button class="btn btn-primary" data-act="admin-monthly" data-member="${m.id}">월간 점검이력</button>
+        <button class="btn btn-soft" data-act="proxy-start" data-member="${m.id}">점검 대신 입력</button>
+        <button class="btn btn-ghost" data-act="admin-missing-list" data-member="${m.id}">과거 미등록일</button>
+        <button class="btn btn-ghost" data-act="pin-reset-admin" data-member="${m.id}">PIN 초기화</button>
+        <button class="btn btn-ghost" data-act="legal-form" data-member="${m.id}" data-ym="${monthKey()}">전자 점검표 보기</button>
+      </div>`);
+  }
+
+  function showAdminMissingList(memberId){
+    const list=missingDates(memberId),m=member(memberId);
+    openModal(`${m.name} 과거 미등록일`,list.length?`<div class="stack">${list.map(d=>`<button class="btn btn-ghost between" data-act="admin-day" data-member="${memberId}" data-date="${d}"><span>${fmt(d)}</span><b>확인/처리</b></button>`).join("")}</div>`:`<div class="success">미등록일 없음</div>`);
+  }
+
+  function showAdminDay(memberId,date){
+    const s=statusOf(memberId,date);
+    openModal(`${member(memberId).name} · ${fmt(date)}`,`
+      <div>${badge(s)}</div>
+      ${s==="점검 미등록"?`<div class="stack section"><button class="btn btn-primary" data-act="proxy-start" data-member="${memberId}" data-date="${date}">관리자 대리입력</button></div>`:""}
+      ${s==="점검안함 확인"?`<button class="btn btn-danger btn-full section" data-act="void-not-performed-by-date" data-member="${memberId}" data-date="${date}">오입력 취소(void)</button>`:""}
+      ${recs(memberId)[date]?`<button class="btn btn-soft btn-full section" data-act="record-admin" data-member="${memberId}" data-date="${date}">기록 상세</button>`:""}`);
+  }
+  function showProxy(memberId,date=TODAY()){
+    const m=member(memberId);
+    openModal(`${m.name} 관리자 대리입력`,`
+      <div class="field"><label>대상 날짜</label><input id="proxyDate" type="date" value="${date}" max="${TODAY()}"></div>
+      <div class="field"><label>점검 결과</label><select id="proxyStatus"><option value="normal">전체 양호</option><option value="not_driving">미운행</option><option value="issue">문제 있음</option></select></div>
+      <div class="field"><label>대리입력 확인방법</label><select id="proxyMethod"><option value="phone">기사 전화 확인</option><option value="visit">기사 방문 확인</option><option value="paper">서면 점검표 확인</option><option value="other">기타</option></select></div>
+      <div class="field"><label>사유/메모</label><textarea id="proxyReason" rows="3" placeholder="필수"></textarea></div>
+      <button class="btn btn-primary btn-full" data-act="proxy-save" data-member="${memberId}">대리입력 저장</button>`);
+  }
+
+  function openModal(title,html){$("#modalTitle").textContent=title;$("#modalBody").innerHTML=html;$("#modal").classList.remove("hidden")}
+  function closeModal(){$("#modal").classList.add("hidden")}
+
+  /* ACTIONS */
+  document.addEventListener("click",e=>{
+    const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
+    if(a==="demo-fill"){$("#lookupVehicle").value="강원81자1234호";$("#lookupName").value="홍길동"}
+    else if(a==="lookup"){if($("#lookupVehicle").value.replace(/\s/g,"")==="강원81자1234호"&&$("#lookupName").value.trim()==="홍길동"){S.driver.step="address";save();renderDriver()}else alert("데모에서는 홍길동 / 강원81자1234호를 입력해 주세요.")}
+    else if(a==="lookup-back"){S.driver.step="lookup";save();renderDriver()}
+    else if(a==="address-ok"){S.driver.step="pin";save();renderDriver()}
+    else if(a==="address-change"){const m=driverMember();openModal("주소 변경 요청",`<div class="info">현재 주소<br><b>${esc(m.address)}</b></div><div class="field"><label>새 주소</label><input id="newAddress"></div><button class="btn btn-primary btn-full" data-act="address-request-save">변경 요청</button>`)}
+    else if(a==="address-request-save"){const v=$("#newAddress").value.trim();if(!v)return alert("새 주소를 입력해 주세요.");const m=driverMember();S.addressRequests.push({id:Date.now(),memberId:m.id,oldValue:m.address,newValue:v,status:"pending",requestedAt:now()});if(!S.driver.registered)S.driver.step="pin";save();closeModal();renderDriver()}
+    else if(a==="pin-save"){const p1=$("#pin1").value,p2=$("#pin2").value;if(!/^\d{4}$/.test(p1)||p1!==p2)return alert("같은 숫자 4자리를 입력해 주세요.");const m=driverMember();m.joined=true;m.trackingStart=TODAY();m.pinState="active";S.driver.registered=true;S.driver.loggedIn=true;S.driver.deviceTrusted=true;S.driver.pin=p1;save();renderDriver()}
+    else if(a==="driver-login"){const m=driverMember();if($("#loginVehicle").value.replace(/\s/g,"")!==m.vehicle.replace(/\s/g,"")||$("#loginPin").value!==S.driver.pin)return alert("차량번호 또는 PIN이 올바르지 않습니다.");S.driver.loggedIn=true;save();renderDriver()}
+    else if(a==="reset-pin-driver"){openModal("새 PIN 설정",`<div class="field"><label>새 PIN</label><input id="resetPin1" maxlength="4" inputmode="numeric" type="password"></div><div class="field"><label>확인</label><input id="resetPin2" maxlength="4" inputmode="numeric" type="password"></div><button class="btn btn-primary btn-full" data-act="reset-pin-driver-save">저장</button>`)}
+    else if(a==="reset-pin-driver-save"){const p1=$("#resetPin1").value,p2=$("#resetPin2").value;if(!/^\d{4}$/.test(p1)||p1!==p2)return alert("같은 숫자 4자리를 입력해 주세요.");const m=driverMember();S.driver.pin=p1;m.pinState="active";S.driver.loggedIn=true;S.driver.deviceTrusted=true;save();closeModal();renderDriver()}
+    else if(a==="driver-logout"){S.driver.loggedIn=false;save();closeModal();renderDriver()}
+    else if(a==="inspect"){closeModal();showInspection(b.dataset.date)}
+    else if(a==="issue-start"){showIssue(b.dataset.date)}
+    else if(a==="issue-save"){const ids=$$(".issue-check:checked").map(x=>Number(x.value));if(!ids.length)return alert("불량 항목을 하나 이상 선택해 주세요.");const note=$("#issueNote").value.trim();saveInspection(b.dataset.date,"issue",ids.map(idx=>({idx,note})))}
+    else if(a==="save-inspection"){saveInspection(b.dataset.date,b.dataset.status)}
+    else if(a==="completion-home"){S.driver.completionDate=null;save();renderDriver()}
+    else if(a==="missing-day"){showMissingDay(b.dataset.date)}
+    else if(a==="missing-all"){showMissingAll()}
+    else if(a==="not-performed"){const m=driverMember(),date=b.dataset.date;if(activeEvent(m.id,date,"inspection_not_performed"))return;S.complianceEvents.push({id:Date.now(),memberId:m.id,date,type:"inspection_not_performed",at:now(),actor:"driver"});save();closeModal();renderDriver()}
+    else if(a==="record"){showRecord(driverMember().id,b.dataset.date,false)}
+    else if(a==="calendar-day"){const id=Number(b.dataset.member),d=b.dataset.date;if(recs(id)[d])showRecord(id,d,false);else showMissingDay(d)}
+    else if(a==="monthly"){closeModal();showMonthly(driverMember().id,false)}
+    else if(a==="calendar-refresh"){const ym=`${$("#calYear").value}-${String($("#calMonth").value).padStart(2,"0")}`;showMonthly(Number(b.dataset.member),b.dataset.admin==="1",ym)}
+    else if(a==="profile"){showProfile()}
+    else if(a==="seed-history"){
+      const m=driverMember();m.trackingStart=shift(TODAY(),-20);const r=recs(m.id);for(let i=-20;i<=-1;i++){const d=shift(TODAY(),i);if(i%6===0)continue;if(i%7===0)r[d]={status:"not_driving",issues:[],late:false,time:"07:50",enteredAt:now(),entryChannel:"driver",revisions:1};else if(i%9===0)r[d]={status:"issue",issues:[{idx:2,note:"창닦이기 점검 후 교체"}],late:i%2===0,time:"08:05",enteredAt:now(),entryChannel:"driver",revisions:1};else r[d]={status:"normal",issues:[],late:i%5===0,time:"07:40",enteredAt:now(),entryChannel:"driver",revisions:1}}
+      save();alert("데모용 과거 20일 기록을 생성했습니다.");renderDriver()
+    }
+    else if(a==="legal-form"){showLegal(Number(b.dataset.member||driverMember().id),b.dataset.ym||monthKey())}
+    else if(a==="print-legal"){printLegal(Number(b.dataset.member),b.dataset.ym)}
+    else if(a==="reset-demo"){if(confirm("모든 데모 데이터를 초기화할까요?")){localStorage.removeItem(KEY);sessionStorage.removeItem(ADMIN_KEY);location.reload()}}
+    else if(a==="admin-login"){if($("#adminId").value==="admin"&&$("#adminPw").value==="1234"&&$("#adminTotp").value==="000000"){S.adminSession={id:1,name:"최고관리자",role:"super_admin",loginAt:now()};addAudit("관리자 로그인","admin","TOTP 인증 성공");save();renderAdmin()}else alert("데모 계정은 admin / 1234 / 000000 입니다.")}
+    else if(a==="admin-logout"){addAudit("관리자 로그아웃","admin","세션 종료");S.adminSession=null;save();renderAdmin()}
+    else if(a==="admin-nav"){renderAdminView(b.dataset.view)}
+    else if(a==="dash-filter"){renderDashboard(b.dataset.filter)}
+    else if(a==="admin-refresh"){renderDashboard()}
+    else if(a==="member-detail"){showMemberDetail(Number(b.dataset.member))}
+    else if(a==="admin-monthly"){closeModal();showMonthly(Number(b.dataset.member),true)}
+    else if(a==="admin-missing-list"){showAdminMissingList(Number(b.dataset.member))}
+    else if(a==="admin-day"){showAdminDay(Number(b.dataset.member),b.dataset.date)}
+    else if(a==="record-admin"){showRecord(Number(b.dataset.member),b.dataset.date,true)}
+    else if(a==="proxy-start"){showProxy(Number(b.dataset.member),b.dataset.date||TODAY())}
+    else if(a==="proxy-save"){
+      const id=Number(b.dataset.member),date=$("#proxyDate").value,status=$("#proxyStatus").value,method=$("#proxyMethod").value,reason=$("#proxyReason").value.trim();
+      if(!reason)return alert("대리입력 사유/메모를 입력해 주세요.");if(date>TODAY())return alert("미래 날짜는 입력할 수 없습니다.");if(recs(id)[date])return alert("이미 기사/관리자 기록이 있어 덮어쓸 수 없습니다.");
+      recs(id)[date]={status,issues:status==="issue"?[{idx:4,note:reason}]:[],late:date<TODAY(),time:time(),enteredAt:now(),entryChannel:"admin_proxy",proxyMethod:method,proxyReason:reason,revisions:1};
+      addAudit("관리자 대리입력",`${member(id).name} ${date}`,`${status} · ${method} · ${reason}`);save();closeModal();renderAdminView("dashboard")
+    }
+    else if(a==="pin-reset-admin"){
+      const id=Number(b.dataset.member),m=member(id);if(!confirm(`${m.name} 회원의 PIN을 초기화할까요?`))return;
+      const before={pinState:m.pinState};m.pinState="reset_required";if(id===driverMember().id){S.driver.loggedIn=false;S.driver.deviceTrusted=false;S.driver.pin=""}
+      addAudit("PIN 초기화",`${m.name} · ${m.vehicle}`,"기존 PIN 폐기 및 세션/신뢰기기 해제",before,{pinState:m.pinState});save();closeModal();renderAdminView("dashboard")
+    }
+    else if(a==="void-not-performed"||a==="void-not-performed-by-date"){
+      let ev;if(a==="void-not-performed")ev=S.complianceEvents.find(x=>x.id===Number(b.dataset.event));else ev=activeEvent(Number(b.dataset.member),b.dataset.date,"inspection_not_performed");
+      if(!ev)return;const reason=prompt("오입력 취소 사유를 입력하세요.");if(!reason)return;
+      const voidEvent={id:Date.now(),memberId:ev.memberId,date:ev.date,type:"inspection_not_performed_voided",at:now(),actor:"admin",originalEventId:ev.id,reason};ev.voidedByEventId=voidEvent.id;S.complianceEvents.push(voidEvent);addAudit("점검안함 확인 취소",`${member(ev.memberId).name} ${ev.date}`,reason);save();closeModal();renderAdminView("dashboard")
+    }
+    else if(a==="change-approve"||a==="change-reject"){
+      const req=S.addressRequests.find(x=>x.id===Number(b.dataset.id));if(!req)return;const m=member(req.memberId),before={address:m.address};
+      if(a==="change-approve"){m.address=req.newValue;req.status="approved";addAudit("주소 변경 승인",`${m.name} · ${m.vehicle}`,"기사 주소변경 요청 승인",before,{address:m.address})}
+      else{req.status="rejected";addAudit("주소 변경 반려",`${m.name} · ${m.vehicle}`,"기사 주소변경 요청 반려",before,before)}
+      req.decidedAt=now();save();renderChangesAdmin()
+    }
+    else if(a==="import-preview"){
+      const file=$("#importFile").files[0];if(!file)return alert("Excel/CSV 파일을 선택해 주세요.");const type=$("#importType").value;
+      const batch={id:Date.now(),filename:file.name,type,status:"review",counts:{new:3,changed:2,status:type==="full_snapshot"?1:0,same:7,review:1},rows:[
+        {kind:"신규",name:"신규회원A",vehicle:"강원92자1111호",diff:"신규 회원",decision:"반영"},
+        {kind:"변경",name:"김철수",vehicle:"강원82자5678호",diff:"주소 변경",decision:"반영"},
+        {kind:"변경",name:"박영수",vehicle:"강원80바9012호",diff:"전화번호 변경",decision:"반영"},
+        {kind:"확인필요",name:"동명이인",vehicle:"강원99자9999호",diff:"관리번호 확인 필요",decision:"보류"},
+        ...(type==="full_snapshot"?[{kind:"상태변경",name:"폐업후보",vehicle:"강원70자1010호",diff:"전체명부에 없음 → inactive 후보",decision:"검토"}]:[])
+      ]};S.importBatches.unshift(batch);addAudit("회원명부 비교",file.name,`${type} 비교 미리보기`);save();$("#importPreview").innerHTML=importPreviewHtml(batch)
+    }
+    else if(a==="import-apply"){const batch=S.importBatches.find(x=>x.id===Number(b.dataset.id));if(!batch)return;batch.status="applied";batch.appliedAt=now();addAudit("회원명부 반영",batch.filename,`${batch.type} 차이 반영`);save();alert("데모: 검토된 차이만 반영 처리했습니다.");renderImportsAdmin()}
+    else if(a==="lockout-release"){const l=S.lockouts.find(x=>x.id===Number(b.dataset.id));if(l)l.released=true;addAudit("로그인 잠금 해제","보안",`lockout ${b.dataset.id}`);save();renderSecurityAdmin()}
+    else if(a==="settings-save"){
+      const before=JSON.parse(JSON.stringify(S.settings));S.settings.lateEntryMode=$("#setLateMode").value;S.settings.lateEntryDays=$("#setLateDays").value?Number($("#setLateDays").value):null;S.settings.driverSameDayEdit=$("#setSameEdit").checked;S.settings.adminCorrection=$("#setAdminCorr").checked;S.settings.staffTotpRequired=$("#setStaffTotp").checked;S.settings.sessionTtlDays=Number($("#setTtl").value);S.settings.maxDevices=Number($("#setDevices").value);addAudit("시스템 설정 변경","system_settings","운영정책 변경",before,S.settings);save();alert("설정을 저장했습니다.");renderSettingsAdmin()
+    }
+    else if(a==="admin-form-open"){showLegal(Number($("#formMember").value),$("#formYm").value)}
+  });
+
+  document.addEventListener("input",e=>{
+    if(e.target.id==="memberSearch"||e.target.id==="statusFilter"){
+      const q=($("#memberSearch")?.value||"").toLowerCase(),f=$("#statusFilter")?.value||"";
+      $$("#memberTableBody tr").forEach(tr=>{tr.style.display=(!q||tr.dataset.search.includes(q))&&(!f||tr.dataset.status.includes(f))?"":"none"})
+    }
+  });
+  document.addEventListener("change",e=>{if(e.target.id==="statusFilter")e.target.dispatchEvent(new Event("input",{bubbles:true}))});
+
+  $("#driverModeBtn").addEventListener("click",()=>setMode("driver"));
+  $("#adminModeBtn").addEventListener("click",()=>setMode("admin"));
+  $("#modalClose").addEventListener("click",closeModal);
+  $("#modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal()});
+
+  setMode(S.mode||"driver");
+})();
+
+</script>
+</body>
+</html>

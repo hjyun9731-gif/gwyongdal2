@@ -1,0 +1,16 @@
+Final verification
+- Python compileall: PASS
+- driver.js node --check: PASS
+- admin.js node --check: PASS
+- pytest: 5 passed
+- Real roster import smoke: PASS
+  - 택배 2,248 source rows -> 2,244 auto-apply + 4 needs_review (duplicate vehicle)
+  - 개인 1,608 source rows -> 1,558 auto-apply + 7 needs_review (duplicate vehicle) + 43 invalid (missing vehicle_number)
+- API smoke: PASS
+  - admin login/TOTP
+  - dashboard
+  - driver lookup/register/PIN/session
+  - 11 checklist items
+  - today normal inspection
+  - home completion state
+  - official-form HTML

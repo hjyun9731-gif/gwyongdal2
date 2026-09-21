@@ -1,0 +1,1 @@
+const CACHE='gwyongdal-v2-shell';self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['/','/static/common.css','/static/driver.js','/static/truck.webp']))));self.addEventListener('fetch',e=>{if(e.request.method==='GET'&&!e.request.url.includes('/api/'))e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)))});
