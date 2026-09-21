@@ -1,7 +1,7 @@
 from datetime import date, datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, Response, UploadFile
 from pydantic import BaseModel
-from sqlalchemy import select, or_, func
+from sqlalchemy import select, func, or_, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from .deps import current_admin, require_staff, require_super
@@ -9,7 +9,7 @@ from ..db import get_db
 from ..models import (AdminUser, AdminSession, AdminActionLog, AuthLockout, Member, DriverAccount, DriverSession,
                       TrustedDevice, Inspection, InspectionResult, InspectionRevision, InspectionItem, ChecklistVersion,
                       ComplianceEvent, MemberChangeRequest, MemberImportBatch, MemberImportRow, SystemSetting, LoginAttempt)
-from ..security import verify_password, verify_totp, random_token, sha256_bytes, utcnow
+from ..security import verify_password, random_token, sha256_bytes, utcnow
 from ..utils import today_kst, normalize_vehicle
 from ..config import settings
 from ..services.roster import preview_import, apply_import, RosterError
@@ -20,7 +20,6 @@ router=APIRouter(prefix="/api/admin",tags=["admin"])
 class AdminLoginIn(BaseModel):
     login_id:str
     password:str
-    totp:str
 class ProxyIn(BaseModel):
     target_date:date
     status:str
@@ -67,12 +66,12 @@ def admin_login(body:AdminLoginIn,request:Request,response:Response,db:Session=D
     if not u:
         fail(db,"admin_ip",ip,5);db.commit();raise HTTPException(401,detail="INVALID_ADMIN_LOGIN")
     if is_locked(db,"admin_user",str(u.id)): raise HTTPException(429,detail="ADMIN_USER_LOCKED")
-    if not verify_password(body.password,u.password_hash) or (u.totp_enabled and not verify_totp(u.totp_secret,body.totp)):
+    if not verify_password(body.password,u.password_hash):
         fail(db,"admin_user",str(u.id),5);fail(db,"admin_ip",ip,10);db.add(LoginAttempt(attempt_type="admin_login",member_id=None,vehicle_number_norm_input=None,ip=ip,user_agent=request.headers.get("user-agent"),result="bad_pin",lock_scope="admin_user"));db.commit();raise HTTPException(401,detail="INVALID_ADMIN_LOGIN")
     reset_lock(db,"admin_user",str(u.id));reset_lock(db,"admin_ip",ip)
     token=random_token();csrf=random_token();now=utcnow()
     ss=AdminSession(admin_user_id=u.id,token_hash=sha256_bytes(token),csrf_token_hash=sha256_bytes(csrf),idle_expires_at=now+timedelta(minutes=30),absolute_expires_at=now+timedelta(hours=12),ip=ip,user_agent=request.headers.get("user-agent"))
-    db.add(ss);u.last_login_at=now;log(db,u,"admin_login","admin_user",str(u.id),reason="TOTP 인증 성공",request=request);db.commit()
+    db.add(ss);u.last_login_at=now;log(db,u,"admin_login","admin_user",str(u.id),reason="비밀번호 인증 성공",request=request);db.commit()
     response.set_cookie("gd_admin",token,httponly=True,secure=settings.app_env=="production",samesite="strict",max_age=12*3600)
     response.set_cookie("gd_admin_csrf",csrf,httponly=False,secure=settings.app_env=="production",samesite="strict",max_age=12*3600)
     return {"ok":True,"admin":{"id":u.id,"name":u.display_name,"role":u.role}}
@@ -87,7 +86,7 @@ def admin_logout(request:Request,response:Response,db:Session=Depends(get_db),ad
 
 @router.get("/auth/me")
 def admin_me(admin:AdminUser=Depends(current_admin)):
-    return {"id":admin.id,"name":admin.display_name,"role":admin.role,"totp_enabled":admin.totp_enabled}
+    return {"id":admin.id,"name":admin.display_name,"role":admin.role}
 
 @router.get("/checklist")
 def admin_checklist(db:Session=Depends(get_db),admin:AdminUser=Depends(current_admin)):
@@ -200,10 +199,16 @@ async def upload_import(request:Request,file:UploadFile=File(...),import_type:st
     return{"id":b.id,"filename":b.original_filename,"import_type":b.import_type,"category_scope":b.category_scope,"status":b.status,"counts":b.counts,"warnings":b.guard_warnings}
 
 @router.get("/member-imports/{batch_id}/rows")
-def import_rows(batch_id:int,classification:str|None=None,db:Session=Depends(get_db),admin:AdminUser=Depends(current_admin)):
-    stmt=select(MemberImportRow).where(MemberImportRow.batch_id==batch_id)
-    if classification:stmt=stmt.where(MemberImportRow.classification==classification)
-    rows=db.scalars(stmt.order_by(MemberImportRow.row_no.nulls_last())).all();return{"items":[{"id":r.id,"row_no":r.row_no,"source":r.source,"name":r.name,"vehicle_number":r.vehicle_number,"management_number":r.management_number,"category":r.category,"classification":r.classification,"review_reason":r.review_reason,"diff":r.diff,"decision":r.decision} for r in rows]}
+def import_rows(batch_id:int,classification:str|None=None,limit:int=100,offset:int=0,db:Session=Depends(get_db),admin:AdminUser=Depends(current_admin)):
+    limit=max(1,min(limit,200))
+    offset=max(0,offset)
+    base=(MemberImportRow.batch_id==batch_id)
+    filters=[base]
+    if classification: filters.append(MemberImportRow.classification==classification)
+    total=db.scalar(select(func.count()).select_from(MemberImportRow).where(*filters)) or 0
+    stmt=select(MemberImportRow).where(*filters).order_by(MemberImportRow.row_no.nulls_last(),MemberImportRow.id).offset(offset).limit(limit)
+    rows=db.scalars(stmt).all()
+    return{"items":[{"id":r.id,"row_no":r.row_no,"source":r.source,"name":r.name,"vehicle_number":r.vehicle_number,"management_number":r.management_number,"category":r.category,"classification":r.classification,"review_reason":r.review_reason,"diff":r.diff,"decision":r.decision} for r in rows],"total":total,"limit":limit,"offset":offset}
 
 @router.post("/member-imports/{batch_id}/apply")
 def apply_batch(batch_id:int,db:Session=Depends(get_db),admin:AdminUser=Depends(require_staff)):

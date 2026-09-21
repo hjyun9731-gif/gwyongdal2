@@ -122,35 +122,121 @@ def preview_import(db: Session, content: bytes, filename: str, import_type: str,
     return batch
 
 def apply_import(db: Session, batch_id: int, admin_id: int) -> dict:
+    """Apply a reviewed roster batch with batched ORM work.
+
+    The previous implementation called ``flush()`` once for every new member,
+    which caused thousands of DB round-trips on Railway.  This version loads
+    existing members in one query, adds new members in one batch, flushes once
+    to obtain their ids, then writes audit/import-row changes in the same
+    transaction.
+    """
     batch=db.get(MemberImportBatch,batch_id)
     if not batch or batch.status!="review": raise RosterError("batch_not_reviewable")
-    rows=db.scalars(select(MemberImportRow).where(MemberImportRow.batch_id==batch_id)).all()
-    applied=0; skipped=0
+
+    rows=db.scalars(
+        select(MemberImportRow)
+        .where(MemberImportRow.batch_id==batch_id)
+        .order_by(MemberImportRow.id)
+    ).all()
+
+    # Decide which rows can actually be applied without touching the DB row-by-row.
+    work=[]; status_work=[]; skipped=0
     for r in rows:
-        if r.classification in {"invalid","same"}: skipped+=1; continue
-        if r.classification=="needs_review" and r.decision!="apply": skipped+=1; continue
+        if r.classification in {"invalid","same"}:
+            skipped+=1; continue
+        if r.classification=="needs_review" and r.decision!="apply":
+            skipped+=1; continue
         if r.classification=="status_change":
             if r.decision!="apply": skipped+=1; continue
-            m=db.get(Member,r.matched_member_id)
-            if m:
-                before={"active":m.active}; m.active=False; m.status_changed_at=datetime.now(timezone.utc); m.inactive_reason="full_snapshot 파일에 없음"; m.last_import_batch_id=batch.id; r.applied_at=datetime.now(timezone.utc); applied+=1
-                db.add(AdminActionLog(admin_user_id=admin_id,action="member_status_change",target_type="member",target_id=str(m.id),member_id=m.id,before_value=before,after_value={"active":False},reason="full_snapshot 누락자 관리자 승인 반영"))
-            continue
+            status_work.append(r); continue
+        work.append(r)
+
+    matched_ids={r.matched_member_id for r in (work+status_work) if r.matched_member_id}
+    members_by_id={}
+    if matched_ids:
+        members_by_id={m.id:m for m in db.scalars(select(Member).where(Member.id.in_(matched_ids))).all()}
+
+    now=datetime.now(timezone.utc)
+    applied=0
+    audit_rows=[]
+
+    # Status changes (inactive candidates)
+    for r in status_work:
+        m=members_by_id.get(r.matched_member_id)
+        if not m:
+            skipped+=1; continue
+        before={"active":m.active}
+        m.active=False
+        m.status_changed_at=now
+        m.inactive_reason="full_snapshot 파일에 없음"
+        m.last_import_batch_id=batch.id
+        r.applied_at=now
+        applied+=1
+        audit_rows.append(AdminActionLog(
+            admin_user_id=admin_id,action="member_status_change",target_type="member",
+            target_id=str(m.id),member_id=m.id,before_value=before,after_value={"active":False},
+            reason="full_snapshot 누락자 관리자 승인 반영"
+        ))
+
+    mapping={
+        "management_number":"management_number","region":"region","vehicle_number":"vehicle_number",
+        "name":"name","category":"category","address":"address","phone":"phone","mobile":"mobile",
+        "membership_status":"master_membership_status","certificate_number":"certificate_number","vehicle_type":"vehicle_type"
+    }
+    audit_fields=["management_number","region","vehicle_number","name","category","address","phone","mobile","master_membership_status","certificate_number","vehicle_type"]
+
+    # Existing members are updated in-memory; SQLAlchemy batches compatible UPDATEs on flush.
+    new_pairs=[]
+    existing_pairs=[]
+    for r in work:
         raw=r.raw or {}
         if r.matched_member_id:
-            m=db.get(Member,r.matched_member_id)
-            if not m: skipped+=1; continue
-            before={k:getattr(m,k,None) for k in ["management_number","region","vehicle_number","name","category","address","phone","mobile","master_membership_status","certificate_number","vehicle_type"]}
+            m=members_by_id.get(r.matched_member_id)
+            if not m:
+                skipped+=1; continue
+            before={k:getattr(m,k,None) for k in audit_fields}
+            existing_pairs.append((r,m,before,raw))
         else:
-            m=Member(vehicle_number=raw.get("vehicle_number") or "",vehicle_number_norm=normalize_vehicle(raw.get("vehicle_number")),name=raw.get("name") or "",active=True)
-            db.add(m); db.flush(); before=None
-        mapping={"management_number":"management_number","region":"region","vehicle_number":"vehicle_number","name":"name","category":"category","address":"address","phone":"phone","mobile":"mobile","membership_status":"master_membership_status","certificate_number":"certificate_number","vehicle_type":"vehicle_type"}
-        for src,dst in mapping.items(): setattr(m,dst,raw.get(src))
-        m.vehicle_number_norm=normalize_vehicle(m.vehicle_number); m.active=True; m.last_import_batch_id=batch.id
-        r.matched_member_id=m.id; r.applied_at=datetime.now(timezone.utc); applied+=1
-        after={k:getattr(m,k,None) for k in ["management_number","region","vehicle_number","name","category","address","phone","mobile","master_membership_status","certificate_number","vehicle_type"]}
-        db.add(AdminActionLog(admin_user_id=admin_id,action="member_import_apply",target_type="member",target_id=str(m.id),member_id=m.id,before_value=before,after_value=after,reason=f"{batch.original_filename} 반영"))
-    batch.status="applied"; batch.applied_by_admin_id=admin_id; batch.applied_at=datetime.now(timezone.utc)
-    db.add(AdminActionLog(admin_user_id=admin_id,action="import_apply",target_type="member_import_batch",target_id=str(batch.id),after_value={"applied":applied,"skipped":skipped},reason="검토된 명부 차이 반영"))
+            m=Member(
+                vehicle_number=raw.get("vehicle_number") or "",
+                vehicle_number_norm=normalize_vehicle(raw.get("vehicle_number")),
+                name=raw.get("name") or "",
+                active=True,
+            )
+            new_pairs.append((r,m,None,raw))
+
+    # Add all new members together, then ONE flush to get every generated member id.
+    if new_pairs:
+        db.add_all([m for _,m,_,_ in new_pairs])
+        db.flush()
+
+    for r,m,before,raw in existing_pairs+new_pairs:
+        for src,dst in mapping.items():
+            setattr(m,dst,raw.get(src))
+        m.vehicle_number_norm=normalize_vehicle(m.vehicle_number)
+        m.active=True
+        m.last_import_batch_id=batch.id
+        r.matched_member_id=m.id
+        r.applied_at=now
+        applied+=1
+        after={k:getattr(m,k,None) for k in audit_fields}
+        audit_rows.append(AdminActionLog(
+            admin_user_id=admin_id,action="member_import_apply",target_type="member",
+            target_id=str(m.id),member_id=m.id,before_value=before,after_value=after,
+            reason=f"{batch.original_filename} 반영"
+        ))
+
+    if audit_rows:
+        db.add_all(audit_rows)
+
+    batch.status="applied"
+    batch.applied_by_admin_id=admin_id
+    batch.applied_at=now
+    db.add(AdminActionLog(
+        admin_user_id=admin_id,action="import_apply",target_type="member_import_batch",
+        target_id=str(batch.id),after_value={"applied":applied,"skipped":skipped},
+        reason="검토된 명부 차이 반영"
+    ))
     db.commit()
     return {"applied":applied,"skipped":skipped}
+

@@ -26,7 +26,7 @@ DEFAULT_SETTINGS = {
     "admin_correction_enabled": (False, False, "관리자 정정 허용"),
     "session_ttl_days": (180, False, "기사 세션 TTL"),
     "max_devices_per_member": (3, False, "회원당 최대 신뢰기기"),
-    "staff_totp_required": (True, False, "staff TOTP 필수"),
+    "staff_totp_required": (False, False, "staff TOTP 사용 안 함"),
 }
 
 def ensure_seed_data(db: Session):
@@ -37,9 +37,12 @@ def ensure_seed_data(db: Session):
             display_name="최고관리자",
             password_hash=hash_password(settings.bootstrap_admin_password),
             role="super_admin", status="active", must_change_password=(settings.app_env=="production"),
-            totp_secret=settings.bootstrap_admin_totp_secret, totp_enabled=True,
+            totp_secret=None, totp_enabled=False,
         )
         db.add(admin)
+    else:
+        admin.totp_secret = None
+        admin.totp_enabled = False
     version = db.scalar(select(ChecklistVersion).where(ChecklistVersion.code == "FORM14_5_2025_12_29"))
     if not version:
         version = ChecklistVersion(
