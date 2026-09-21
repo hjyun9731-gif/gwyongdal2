@@ -1,7 +1,7 @@
 from datetime import date, datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, Response, UploadFile
 from pydantic import BaseModel
-from sqlalchemy import select, or_, func
+from sqlalchemy import select, func, or_, func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from .deps import current_admin, require_staff, require_super
@@ -199,10 +199,16 @@ async def upload_import(request:Request,file:UploadFile=File(...),import_type:st
     return{"id":b.id,"filename":b.original_filename,"import_type":b.import_type,"category_scope":b.category_scope,"status":b.status,"counts":b.counts,"warnings":b.guard_warnings}
 
 @router.get("/member-imports/{batch_id}/rows")
-def import_rows(batch_id:int,classification:str|None=None,db:Session=Depends(get_db),admin:AdminUser=Depends(current_admin)):
-    stmt=select(MemberImportRow).where(MemberImportRow.batch_id==batch_id)
-    if classification:stmt=stmt.where(MemberImportRow.classification==classification)
-    rows=db.scalars(stmt.order_by(MemberImportRow.row_no.nulls_last())).all();return{"items":[{"id":r.id,"row_no":r.row_no,"source":r.source,"name":r.name,"vehicle_number":r.vehicle_number,"management_number":r.management_number,"category":r.category,"classification":r.classification,"review_reason":r.review_reason,"diff":r.diff,"decision":r.decision} for r in rows]}
+def import_rows(batch_id:int,classification:str|None=None,limit:int=100,offset:int=0,db:Session=Depends(get_db),admin:AdminUser=Depends(current_admin)):
+    limit=max(1,min(limit,200))
+    offset=max(0,offset)
+    base=(MemberImportRow.batch_id==batch_id)
+    filters=[base]
+    if classification: filters.append(MemberImportRow.classification==classification)
+    total=db.scalar(select(func.count()).select_from(MemberImportRow).where(*filters)) or 0
+    stmt=select(MemberImportRow).where(*filters).order_by(MemberImportRow.row_no.nulls_last(),MemberImportRow.id).offset(offset).limit(limit)
+    rows=db.scalars(stmt).all()
+    return{"items":[{"id":r.id,"row_no":r.row_no,"source":r.source,"name":r.name,"vehicle_number":r.vehicle_number,"management_number":r.management_number,"category":r.category,"classification":r.classification,"review_reason":r.review_reason,"diff":r.diff,"decision":r.decision} for r in rows],"total":total,"limit":limit,"offset":offset}
 
 @router.post("/member-imports/{batch_id}/apply")
 def apply_batch(batch_id:int,db:Session=Depends(get_db),admin:AdminUser=Depends(require_staff)):
